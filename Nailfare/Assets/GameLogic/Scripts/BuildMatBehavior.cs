@@ -6,6 +6,7 @@ public class BuildMatBehavior : MonoBehaviour
 {
     public bool anchored = false;
     public bool inConstrBase = false;
+    public ConstructionBase cb;
 
     public void CheckIfAbleToFix()
     {
@@ -19,8 +20,9 @@ public class BuildMatBehavior : MonoBehaviour
     {
         GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
         anchored = true;
-        ConstructionBase.amountOfBMats++;
-        ConstructionBase.CheckVictory();
+        ConstructionBase cb = FindObjectOfType<ConstructionBase>();
+        cb.amountOfBMats++;
+        cb.CheckVictory();
     }
 
     private void OnCollisionEnter(Collision collision)

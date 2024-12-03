@@ -1,51 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.Processors;
 using UnityEngine.XR.Interaction.Toolkit;
 
 public class PlayerBehaviour : MonoBehaviour
 {
-    [SerializeField] NailgunBehaviour nailgun;
+    public static PlayerBehaviour instance;
 
     [SerializeField] float HP;
 
-    public static PlayerBehaviour instance;
+    [SerializeField] GameObject locomotionSystem;
+
+    private bool dead = false;
+
     void Start()
     {
         instance = this;
 
-        //StartCoroutine(AutoShoot()); // Delete later
-    }
-
-    IEnumerator AutoShoot() // Delete later (just for testing)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.33f);
-            nailgun.Shoot();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        OVRInput.FixedUpdate();
-    }
-
-    private void Update()
-    {
-        OVRInput.Update();
-        Shoot();
-    }
-
-    void Shoot()
-    {
-        bool pressed = OVRInput.GetDown(OVRInput.Button.SecondaryIndexTrigger);
-
-        if (pressed)
-        {
-            Debug.Log("Shoot");
-            nailgun.Shoot();
-        }
+        HUDManager.instance.SetText("Sobrevive a la horda de demonios rojos y completa tu construcción");
+        HUDManager.instance.UpdateHealthBar(HP);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -62,25 +36,25 @@ public class PlayerBehaviour : MonoBehaviour
     {
         HP -= eb.DMG;
 
-        /*Actualize HP display*/
+        HUDManager.instance.UpdateHealthBar(HP);
 
-        if (HP <= 0)
+        if (HP <= 0 && !dead)
         {
+            dead = true;
             OnDeath();
-        }
-        else
-        {
-            
-            Vector3 push = eb.gameObject.transform.forward;
-            push.y = 1.5f;
-            push *= 1000;
-            //gameObject.GetComponent<Rigidbody>().velocity = push;
-            gameObject.GetComponent<Rigidbody>().AddForce(push);
         }
     }
 
     void OnDeath()
     {
-        /*Show message, stop movement, restart after some time*/
+        HUDManager.instance.SetText("Has muerto");
+        locomotionSystem.SetActive(false);
+        StartCoroutine(Restart());
+    }
+
+    IEnumerator Restart()
+    {
+        yield return new WaitForSeconds(3);
+        UnityEngine.SceneManagement.SceneManager.LoadScene(0);
     }
 }

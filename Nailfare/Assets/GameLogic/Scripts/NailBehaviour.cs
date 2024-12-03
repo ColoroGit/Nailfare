@@ -8,21 +8,27 @@ public class NailBehaviour : MonoBehaviour
     public GameObject gun;
     public GameObject player;
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (gun == collision.gameObject || player == collision.gameObject)
+        if (gun == other.gameObject || player == other.gameObject)
         {
             return;
         }
 
-        BuildMatBehavior bmb = collision.gameObject.GetComponent<BuildMatBehavior>();
+        BuildMatBehavior bmb = other.gameObject.GetComponentInParent<BuildMatBehavior>();
 
         if (bmb != null)
         {
+            Debug.Log("Build mat hit");
             bmb.CheckIfAbleToFix();
         }
 
         // Detect Enemy and kill
+        EnemyBehaviour eb = other.gameObject.GetComponent<EnemyBehaviour>();
+        if (eb != null)
+        {
+            eb.CheckHP(DMG);
+        }
 
         Destroy(gameObject);
     }

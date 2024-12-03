@@ -5,6 +5,7 @@ using UnityEngine;
 public class NailgunBehaviour : MonoBehaviour
 {
     [SerializeField] GameObject nailPrefab /*= prefab nail*/;
+    [SerializeField] GameObject spawnPoint;
     [SerializeField] float recoil = 1f;
     [SerializeField] float DMG = 1f;
 
@@ -19,11 +20,12 @@ public class NailgunBehaviour : MonoBehaviour
 
             if (nailPrefab != null)
             {
-                GameObject nail = Instantiate(nailPrefab, gameObject.transform);
+                GameObject nail = Instantiate(nailPrefab, spawnPoint.transform.position, spawnPoint.transform.rotation * Quaternion.Euler(90, 0, 0));
                 nail.GetComponent<NailBehaviour>().DMG = DMG;
                 nail.GetComponent<NailBehaviour>().gun = gameObject;
                 nail.GetComponent<NailBehaviour>().player = PlayerBehaviour.instance.gameObject;
-                nail.GetComponent<Rigidbody>().AddForce(gameObject.transform.forward * 1000);
+                nail.GetComponent<Rigidbody>().AddForce(spawnPoint.transform.forward * 1000);
+                Destroy(nail, 5);
             }
             else
             {
